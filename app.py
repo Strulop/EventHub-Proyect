@@ -221,7 +221,18 @@ def procesar_compra():
     return render_template("descargar_ticket.html", filename=tmp_filename)
 
     
-
+@app.route('/enviar-correo-contacto', methods=['POST'])
+def enviar_correo_contacto():
+    nombre = request.form.get("name")
+    correo = request.form.get("email")
+    asunto = request.form.get("subject")
+    mensaje = request.form.get("message")
+    print("llega todo")
+    enviar_correo("eventhub.oficial@gmail.com", asunto, mensaje + " - Correo enviado por: " + correo + ". La persona se llama "+nombre, None)
+    flash("Gracias por su Consulta, en breve nos comunicaremos con usted", "success")
+    
+    return render_template("contacto.html")
+    
 @app.route('/contacto')
 def contacto():
     return render_template("contacto.html")

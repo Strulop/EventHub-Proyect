@@ -48,31 +48,39 @@
   <section class="py-5">
     <div class="container">
       <div class="row g-5">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+        {% endwith %}
         <!-- Contact Form -->
         <div class="col-lg-7">
+          
           <h2 class="mb-4">Envíanos un mensaje</h2>
-          <form id="contactForm">
+          <form id="contactForm" action="/enviar-correo-contacto" method="POST">
             <div class="row g-3">
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="name" class="form-label">Nombre completo</label>
-                  <input type="text" class="form-control" id="name" required>
+                  <input type="text" class="form-control" id="name" name="name" required>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="mb-3">
                   <label for="email" class="form-label">Email</label>
-                  <input type="email" class="form-control" id="email" required>
+                  <input type="email" class="form-control" id="email" name="email" required>
                 </div>
               </div>
             </div>
             <div class="mb-3">
               <label for="subject" class="form-label">Asunto</label>
-              <input type="text" class="form-control" id="subject" required>
+              <input type="text" class="form-control" id="subject" name="subject" required>
             </div>
             <div class="mb-3">
               <label for="message" class="form-label">Mensaje</label>
-              <textarea class="form-control" id="message" rows="5" required></textarea>
+              <textarea class="form-control" id="message" rows="5" name="message" required></textarea>
             </div>
 
             <!-- Checkbox de consentimiento -->
@@ -198,25 +206,6 @@
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Form handling
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      // Get form values
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const subject = document.getElementById('subject').value;
-      const message = document.getElementById('message').value;
-      
-      // Here you would typically send the data to your server
-      console.log('Form submitted:', { name, email, subject, message });
-      
-      // Show success message
-      alert('¡Gracias por tu mensaje! Te contactaremos pronto.');
-      
-      // Reset form
-      this.reset();
-    });
-  </script>
+
 </body>
 </html>
