@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>{% block title %}EventHub{% endblock %}</title>
+
+  <!-- Bootstrap CSS -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet"
+  >
+  <!-- Bootstrap Icons -->
+  <link 
+    rel="stylesheet" 
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+  >
+  <!-- Estilos globales -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/home.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Navbar común -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark-blue">
+    <div class="container">
+      <a class="navbar-brand" href="{{ url_for('home') }}">EventHub</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link{% if request.endpoint=='home' %} active{% endif %}" href="{{ url_for('home') }}">Eventos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link{% if request.endpoint=='contacto' %} active{% endif %}" href="{{ url_for('contacto') }}">Contacto</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          {% if session.get('user_id') %}
+            <span class="navbar-text me-3">Hola, {{ session.user_name }}</span>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light me-2">Cerrar Sesión</a>
+            {% if session.get('user_role') == 'organizador' %}
+              <a href="{{ url_for('admin_seccion') }}" class="btn btn-green">Administración</a>
+            {% endif %}
+          {% else %}
+            <button class="btn btn-outline-light me-2" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar Sesión</button>
+            <button class="btn btn-green" data-bs-toggle="modal" data-bs-target="#registerModal">Registrarse</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Aquí iría tu banner de cookies / CookieConsent -->
+
+  <!-- Contenido principal -->
+  <main class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer común -->
+  <footer class="bg-dark-blue text-white mt-auto py-4">
+    <div class="container text-center">
+      <p class="mb-1">&copy; 2025 EventHub. Todos los derechos reservados.</p>
+      <a href="{{ url_for('cookie_policy') }}" class="text-white">Política de Cookies</a>
+    </div>
+  </footer>
+
+  <!-- Scripts comunes -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

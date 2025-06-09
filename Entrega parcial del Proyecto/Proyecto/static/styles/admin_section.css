@@ -1,0 +1,84 @@
+:root {
+    --primary-green: #28a745;
+    --primary-blue: #0d2246;
+}
+
+.bg-dark-blue {
+    background-color: var(--primary-blue);
+}
+
+.btn-green {
+    background-color: var(--primary-green);
+    color: white;
+}
+
+.btn-green:hover {
+    background-color: #218838;
+    color: white;
+}
+
+.navbar {
+    padding: 1rem;
+}
+
+.page-header {
+    background: linear-gradient(rgba(13, 34, 70, 0.9), rgba(13, 34, 70, 0.9)),
+                url('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 40px 0;
+}
+
+.admin-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 25px;
+}
+
+.table-responsive {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.table th {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.action-buttons .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+footer {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 3rem 0;
+}
+
+.social-links a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+.social-links a:hover {
+    color: var(--primary-green);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-green);
+    border-color: var(--primary-green);
+}
+
+.pagination .page-link {
+    color: var(--primary-blue);
+}
+
+.event-image-preview {
+    max-height: 150px;
+    max-width: 100%;
+    border-radius: 4px;
+    margin-top: 10px;
+}

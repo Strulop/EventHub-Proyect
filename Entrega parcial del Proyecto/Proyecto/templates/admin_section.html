@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventHub - Panel de Administración</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin_section.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark-blue">
+    <div class="container">
+      <a class="navbar-brand" href="#">EventHub</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('home') }}">Inicio</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          <div class="dropdown">
+            <button class="btn btn-green dropdown-toggle" type="button" id="adminDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person-circle me-1"></i> Admin
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+              <li>
+                <a class="dropdown-item active" href="#" onclick="mostrarSeccion('eventos', this)">
+                  <i class="bi bi-calendar-event me-2"></i>Gestionar Eventos
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" onclick="mostrarSeccion('usuarios', this)">
+                  <i class="bi bi-people me-2"></i>Gestionar Usuarios
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" onclick="mostrarSeccion('categorias', this)">
+                  <i class="bi bi-tag me-2"></i>Gestionar Categorías
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#" onclick="mostrarSeccion('ubicaciones', this)">
+                  <i class="bi bi-geo-alt me-2"></i>Gestionar Ubicaciones
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <section class="page-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h1 class="display-5 mb-2">Panel de Administración</h1>
+          <p class="lead">Administración de datos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Secciones de Administración -->
+  <div class="container mb-4">
+    <!-- Sección: Gestionar Eventos (visible por defecto) -->
+    <div id="seccion-eventos" class="admin-section">
+      <div class="my-3 text-end">
+        <button class="btn btn-green" data-bs-toggle="modal" data-bs-target="#eventoModal">
+          <i class="bi bi-plus-circle me-2"></i>Crear Nuevo Evento
+        </button>
+      </div>
+      <!-- Tabla de eventos (como en tu código original) -->
+      <div class="admin-card">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Duración</th>
+                <th>Precio</th>
+                <th>Capacidad</th>
+                <th>Disponibles</th>
+                <th>Categoría</th>
+                <th>Ubicación</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for evento in eventos %}
+              <tr>
+                <td>{{ evento.id }}</td>
+                <td>{{ evento.nombre }}</td>
+                <td>{{ evento.fecha }}</td>
+                <td>{{ evento.hora_inicio[:5] }}</td>
+                <td>{{ evento.duracion }}</td>
+                <td>€{{ evento.precio }}</td>
+                <td>{{ evento.capacidad }}</td>
+                <td>{{ evento.tickets_disponibles }}</td>
+                {% for categoria in categorias %}
+                  {% if categoria.id == evento.id_categoria %}
+                    <td>{{ categoria.nombre }}</td>
+                  {% endif %}
+                {% endfor %}
+                {% for ubicacion in ubicaciones %}
+                  {% if ubicacion.id == evento.id_ubicacion %}
+                    <td>{{ ubicacion.nombre }}</td>
+                  {% endif %}
+                {% endfor %}
+                <td class="action-buttons">
+                  <button class="btn btn-sm btn-primary" onclick='editarEvento({{ evento | tojson | safe }})'>
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="confirmarEliminarGenerico({{ evento.id }}, '{{ evento.nombre }}','evento')">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Gestionar Usuarios -->
+    <div id="seccion-usuarios" class="admin-section" style="display:none;">
+      <div class="my-3 text-end">
+          <button class="btn btn-green" data-bs-toggle="modal" data-bs-target="#usuarioModal">
+            <i class="bi bi-plus-circle me-2"></i>Crear Nuevo Usuario
+        </button>
+      </div>
+      <div class="admin-card">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for usuario in usuarios %}
+              <tr>
+                <td>{{ usuario.id }}</td>
+                <td>{{ usuario.nombre }}</td>
+                <td>{{ usuario.email }}</td>
+                <td>{{ usuario.rol }}</td>
+                <td>{{ usuario.fecha_registro }}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick='editarUsuario({{ usuario | tojson | safe }})'>
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="confirmarEliminarGenerico({{ usuario.id }}, '{{ usuario.nombre }}','usuario')">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Gestionar Categorías -->
+    <div id="seccion-categorias" class="admin-section" style="display:none;">
+      <div class="my-3 text-end">
+        <button class="btn btn-green" data-bs-toggle="modal" data-bs-target="#categoriaModal">
+          <i class="bi bi-plus-circle me-2"></i>Crear Nueva Categoría
+        </button>
+      </div>
+      <div class="admin-card">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover mb-0">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for categoria in categorias %}
+              <tr>
+                <td>{{ categoria.id }}</td>
+                <td>{{ categoria.nombre }}</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick='editarCategoria({{ categoria | tojson | safe }})'>
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" onclick="confirmarEliminarGenerico({{ categoria.id }}, '{{ categoria.nombre }}','categoria' )">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección: Gestionar Ubicaciones -->
+<div id="seccion-ubicaciones" class="admin-section" style="display:none;">
+  <div class="my-3 text-end">
+    <button class="btn btn-green" data-bs-toggle="modal" data-bs-target="#ubicacionModal">
+      <i class="bi bi-plus-circle me-2"></i>Crear Nueva Ubicación
+    </button>
+  </div>
+  <div class="admin-card">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover mb-0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ubicacion in ubicaciones %}
+          <tr>
+            <td>{{ ubicacion.id }}</td>
+            <td>{{ ubicacion.nombre }}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick='editarUbicacion({{ ubicacion | tojson | safe }})'>
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="confirmarEliminarGenerico({{ ubicacion.id }}, '{{ ubicacion.nombre }}','ubicacion')">
+                <i class="bi bi-trash"></i>
+              </button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+ 
+
+  <!-- Modal para Crear/Editar Evento (se mantiene igual) -->
+  <div class="modal fade" id="eventoModal" tabindex="-1" aria-labelledby="eventoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-dark-blue text-white">
+          <h5 class="modal-title" id="eventoModalLabel">Crear Nuevo Evento</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="eventoForm" action="/nuevo-evento-creado" method="POST">
+            <input type="hidden" id="eventoId" name="eventoId" value="">
+            
+            <div class="row mb-3">
+              <div class="col-md-8">
+                <label for="nombre" class="form-label">Nombre del Evento *</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="150">
+              </div>
+              <div class="col-md-4">
+                <label for="precio" class="form-label">Precio (€) *</label>
+                <input type="number" class="form-control" id="precio" name="precio" required min="1">
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripción</label>
+              <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label for="fecha" class="form-label">Fecha *</label>
+                <input type="date" class="form-control" id="fecha" name="fecha" required>
+              </div>
+              <div class="col-md-4">
+                <label for="hora_inicio" class="form-label">Hora de Inicio *</label>
+                <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
+              </div>
+              <div class="col-md-4">
+                <label for="duracion" class="form-label">Duración (minutos) *</label>
+                <input type="number" class="form-control" id="duracion" name="duracion" required min="1">
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="capacidad" class="form-label">Capacidad Total *</label>
+                <input type="number" class="form-control" id="capacidad" name="capacidad" required min="1">
+              </div>
+              <div class="col-md-6">
+                <label for="tickets_disponibles" class="form-label">Tickets Disponibles *</label>
+                <input type="number" class="form-control" id="tickets_disponibles" name="tickets_disponibles" required min="1">
+              </div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="id_categoria" class="form-label">Categoría *</label>
+                <select class="form-select" id="id_categoria" name="id_categoria" required>
+                  <option value="">Todas las categorías</option>
+                  {% for categoria in categorias %}
+                  <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="id_ubicacion" class="form-label">Ubicación *</label>
+                <select class="form-select" id="id_ubicacion" name="id_ubicacion" required>
+                  <option value="">Todas las ubicaciones</option>
+                  {% for ubicacion in ubicaciones %}
+                  <option value="{{ ubicacion.id }}">{{ ubicacion.nombre }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="url_imagen" class="form-label">URL de la Imagen *</label>
+              <input type="url" class="form-control" id="url_imagen" name="url_imagen" required>
+              <div class="mt-2" id="imagenPreviewContainer">
+                <img id="imagenPreview" class="event-image-preview d-none" alt="Vista previa de la imagen">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-green" id="btnSubmitEvento">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Crear/Editar Categoría -->
+  <div class="modal fade" id="categoriaModal" tabindex="-1" aria-labelledby="categoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-dark-blue text-white">
+          <h5 class="modal-title" id="categoriaModalLabel">Crear Nueva Categoría</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="categoriaForm" action="/nueva-categoria" method="POST">
+            <input type="hidden" id="categoriaId" name="categoriaId" value="">
+            <div class="mb-3">
+              <label for="nombre_categoria" class="form-label">Nombre de la Categoría *</label>
+              <input type="text" class="form-control" id="nombre_categoria" name="nombre_categoria" required maxlength="50">
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-green" id="btnSubmitCategoria">Guardar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación para Eliminar Evento -->
+  <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>¿Estás seguro de que deseas eliminar <strong id="eventoEliminarNombre"></strong>?</p>
+          <p class="text-danger">Esta acción no se puede deshacer.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-danger" id="confirmarEliminar">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Crear/Editar Ubicación -->
+<div class="modal fade" id="ubicacionModal" tabindex="-1" aria-labelledby="ubicacionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-dark-blue text-white">
+        <h5 class="modal-title" id="ubicacionModalLabel">Crear Nueva Ubicación</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="ubicacionForm" action="/nueva-ubicacion" method="POST">
+          <input type="hidden" id="ubicacionId" name="ubicacionId" value="">
+          <div class="mb-3">
+            <label for="nombre_ubicacion" class="form-label">Nombre de la Ubicación *</label>
+            <input type="text" class="form-control" id="nombre_ubicacion" name="nombre_ubicacion" required maxlength="50">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-green" id="btnSubmitUbicacion">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal para Crear/Editar Usuario -->
+<div class="modal fade" id="usuarioModal" tabindex="-1" aria-labelledby="usuarioModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-dark-blue text-white">
+        <h5 class="modal-title" id="usuarioModalLabel">Crear Nuevo Usuario</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="usuarioForm" action="/nuevo-usuario" method="POST">
+          <input type="hidden" id="usuarioId" name="usuarioId" value="">
+          <div class="mb-3">
+            <label for="nombre_usuario" class="form-label">Nombre Completo *</label>
+            <input type="text" class="form-control" id="nombre_usuario" name="nombre_usuario" required maxlength="100">
+          </div>
+          <div class="mb-3">
+            <label for="email_usuario" class="form-label">Email *</label>
+            <input type="email" class="form-control" id="email_usuario" name="email_usuario" required>
+          </div>
+          <div class="mb-3">
+            <label for="rol_usuario" class="form-label">Rol *</label>
+            <select class="form-select" id="rol_usuario" name="rol_usuario" required>
+              <option value="">Seleccionar Rol</option>
+              <option value="organizador">Organizador</option>
+              <option value="asistente">Asistente</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-green" id="btnSubmitUsuario">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Formulario oculto para eliminación (se puede reutilizar para eventos y categorías, diferenciando la URL) -->
+  <form id="deleteForm" method="POST" style="display:none;"></form>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+     // Variables globales para modales
+     let itemIdEliminar = null;
+    const eventoModalInstance = new bootstrap.Modal(document.getElementById('eventoModal'));
+    const eliminarModalInstance = new bootstrap.Modal(document.getElementById('eliminarModal'));
+
+    // Función para cambiar sección visible
+    function mostrarSeccion(seccion, enlace) {
+      const secciones = document.querySelectorAll('.admin-section');
+      secciones.forEach(function(s) {
+        s.style.display = 'none';
+      });
+      document.getElementById('seccion-' + seccion).style.display = 'block';
+      localStorage.setItem('currentSection', seccion);
+      const enlaces = document.querySelectorAll('.dropdown-menu a');
+      enlaces.forEach(function(a) {
+        a.classList.remove('active');
+      });
+      if(enlace) {
+        enlace.classList.add('active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const seccionGuardada = localStorage.getItem('currentSection') || 'eventos';
+    mostrarSeccion(seccionGuardada);
+    });
+
+
+    // Modal de evento: modo crear
+    document.querySelector('[data-bs-target="#eventoModal"]').addEventListener('click', function() {
+      document.getElementById('eventoModalLabel').textContent = 'Crear Nuevo Evento';
+      document.getElementById('eventoForm').reset();
+      document.getElementById('eventoId').value = '';
+      document.getElementById('btnSubmitEvento').textContent = 'Guardar';
+      document.getElementById('eventoForm').action = '/nuevo-evento-creado';
+    });
+
+    // Función para confirmar eliminación de eventos, categorías, ubicaciones o usuarios
+    function confirmarEliminarGenerico(id, nombre, tipo) {
+      itemIdEliminar = id;
+      // Se usará un mismo modal para todos. Actualizamos el texto según el tipo:
+      document.getElementById('eventoEliminarNombre').textContent = nombre;
+      // Dependiendo del tipo, definimos la acción
+      let actionUrl = '';
+      if (tipo === 'evento') {
+        actionUrl = '/eliminar-evento/' + id;
+      } else if (tipo === 'categoria') {
+        actionUrl = '/eliminar-categoria/' + id;
+      } else if (tipo === 'ubicacion') {
+        actionUrl = '/eliminar-ubicacion/' + id;
+      } else if (tipo === 'usuario') {
+        actionUrl = '/eliminar-usuario/' + id;
+      }
+      document.getElementById('deleteForm').action = actionUrl;
+      eliminarModalInstance.show();
+    }
+
+    // Asignamos la acción al botón de confirmar eliminación
+    document.getElementById('confirmarEliminar').addEventListener('click', function() {
+      if (itemIdEliminar) {
+        document.getElementById('deleteForm').submit();
+      }
+    });
+
+    // Función para editar un evento
+    function editarEvento(evento) {
+      document.getElementById('eventoModalLabel').textContent = 'Editar Evento';
+      document.getElementById('eventoId').value = evento.id;
+      document.getElementById('nombre').value = evento.nombre;
+      document.getElementById('precio').value = evento.precio;
+      document.getElementById('descripcion').value = evento.descripcion;
+      let fechaISO = new Date(evento.fecha).toISOString().split('T')[0];
+      document.getElementById('fecha').value = fechaISO;
+      document.getElementById('hora_inicio').value = evento.hora_inicio;
+      document.getElementById('duracion').value = evento.duracion;
+      document.getElementById('capacidad').value = evento.capacidad;
+      document.getElementById('tickets_disponibles').value = evento.tickets_disponibles;
+      document.getElementById('id_categoria').value = evento.id_categoria;
+      document.getElementById('id_ubicacion').value = evento.id_ubicacion;
+      document.getElementById('url_imagen').value = evento.url_imagen;
+      document.getElementById('btnSubmitEvento').textContent = 'Editar';
+      document.getElementById('eventoForm').action = '/editar-evento';
+      eventoModalInstance.show();
+    }
+
+    // Modal de categoría: modo crear
+    document.querySelector('[data-bs-target="#categoriaModal"]').addEventListener('click', function() {
+      document.getElementById('categoriaModalLabel').textContent = 'Crear Nueva Categoría';
+      document.getElementById('categoriaForm').reset();
+      document.getElementById('categoriaId').value = '';
+      document.getElementById('btnSubmitCategoria').textContent = 'Guardar';
+      document.getElementById('categoriaForm').action = '/nueva-categoria';
+    });
+
+    // Función para editar una categoría
+    function editarCategoria(categoria) {
+      document.getElementById('categoriaModalLabel').textContent = 'Editar Categoría';
+      document.getElementById('categoriaId').value = categoria.id;
+      document.getElementById('nombre_categoria').value = categoria.nombre;
+      document.getElementById('btnSubmitCategoria').textContent = 'Editar';
+      document.getElementById('categoriaForm').action = '/editar-categoria';
+      new bootstrap.Modal(document.getElementById('categoriaModal')).show();
+    }
+
+    // Modal de ubicación: modo crear
+    document.querySelector('[data-bs-target="#ubicacionModal"]').addEventListener('click', function() {
+      document.getElementById('ubicacionModalLabel').textContent = 'Crear Nueva Ubicación';
+      document.getElementById('ubicacionForm').reset();
+      document.getElementById('ubicacionId').value = '';
+      document.getElementById('btnSubmitUbicacion').textContent = 'Guardar';
+      document.getElementById('ubicacionForm').action = '/nueva-ubicacion';
+    });
+
+    // Función para editar una ubicación
+    function editarUbicacion(ubicacion) {
+      document.getElementById('ubicacionModalLabel').textContent = 'Editar Ubicación';
+      document.getElementById('ubicacionId').value = ubicacion.id;
+      document.getElementById('nombre_ubicacion').value = ubicacion.nombre;
+      document.getElementById('btnSubmitUbicacion').textContent = 'Editar';
+      document.getElementById('ubicacionForm').action = '/editar-ubicacion';
+      new bootstrap.Modal(document.getElementById('ubicacionModal')).show();
+    }
+
+    // Modal de usuario: modo crear
+    document.querySelector('[data-bs-target="#usuarioModal"]').addEventListener('click', function() {
+      document.getElementById('usuarioModalLabel').textContent = 'Crear Nuevo Usuario';
+      document.getElementById('usuarioForm').reset();
+      document.getElementById('usuarioId').value = '';
+      document.getElementById('btnSubmitUsuario').textContent = 'Guardar';
+      document.getElementById('usuarioForm').action = '/nuevo-usuario';
+    });
+
+    // Función para editar un usuario
+    function editarUsuario(usuario) {
+      document.getElementById('usuarioModalLabel').textContent = 'Editar Usuario';
+      document.getElementById('usuarioId').value = usuario.id;
+      document.getElementById('nombre_usuario').value = usuario.nombre;
+      document.getElementById('email_usuario').value = usuario.email;
+      document.getElementById('rol_usuario').value = usuario.rol;
+      document.getElementById('btnSubmitUsuario').textContent = 'Editar';
+      document.getElementById('usuarioForm').action = '/editar-usuario';
+      new bootstrap.Modal(document.getElementById('usuarioModal')).show();
+    }
+  </script>
+  <script src="{{ url_for('static', filename='js/admin_section.js') }}"></script>
+</body>
+</html>
