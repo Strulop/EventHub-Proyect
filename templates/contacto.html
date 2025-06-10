@@ -174,32 +174,36 @@
   </section>
 
   <!-- Footer -->
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-4 mb-4 mb-lg-0">
-          <h5>EventHub</h5>
-          <p>Tu plataforma confiable para la gestión de eventos</p>
-        </div>
-        <div class="col-lg-4 mb-4 mb-lg-0">
-          <h5>Enlaces Rápidos</h5>
-          <ul class="list-unstyled">
-            <li><a href="{{ url_for('home') }}" class="text-white">Eventos</a></li>
-            <li><a href="{{ url_for('contacto') }}" class="text-white">Contacto</a></li>
-          </ul>
-        </div>
-        <div class="col-lg-4">
-          <h5>Síguenos</h5>
-          <div class="social-links">
-            <a href="https://github.com/Strulop" class="text-white">
-              <i class="fab fa-github fa-2x"></i>
-            </a>
+  <footer class="bg-dark-blue text-white py-5">
+        <div class="container">
+            <!-- Row como flexbox con espacio entre columnas -->
+            <div class="row d-flex justify-content-between">
+            <div class="col-lg-4 mb-4 mb-lg-0 text-center">
+                <h5>EventHub</h5>
+                <p>Tu plataforma confiable para la gestión de eventos</p>
+            </div>
+            <div class="col-lg-4 mb-4 mb-lg-0 text-center">
+                <h5>Enlaces Rápidos</h5>
+                <ul class="list-unstyled">
+                <li><a href="{{ url_for('home') }}" class="text-white">Eventos</a></li>
+                <li><a href="{{ url_for('contacto') }}" class="text-white">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4 text-center">
+                <h5>Síguenos</h5>
+                <div class="social-links">
+                <a href="https://github.com/Strulop" class="text-white mx-2">
+                    <i class="fab fa-github fa-2x"></i>
+                </a>
+                <!-- Añade más íconos si quieres -->
+                </div>
+            </div>
           </div>
-        </div>
-      </div>
+        
       <hr class="mt-4 mb-4 border-light">
       <div class="text-center">
         <p class="mb-0">&copy; 2025 EventHub. Todos los derechos reservados.</p>
+        <a href="{{ url_for('cookie_policy') }}" class="text-white">Política de Privacidad</a>
       </div>
     </div>
   </footer>
